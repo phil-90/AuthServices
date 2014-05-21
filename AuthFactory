@@ -1,0 +1,37 @@
+appu.factory('sessionFactory',function(){
+    return{
+        get: function(key){ 
+           return sessionStorage.getItem(key);
+        },
+        set: function(key, value){
+            return sessionStorage.setItem(key, value);
+        },
+        unset: function(key){
+            return sessionStorage.removeItem(key);
+        }
+    };
+});
+
+appu.factory('authenticateFactory', function($http, $location, sessionFactory){
+    var cacheSession = function(){
+        sessionFactory.set('authenticated', true);
+    };
+    var uncacheSession = function(){
+        sessionFactory.unset('authenticated');
+    };
+    return{
+        login: function(credentials){
+            var login = $http.post('partials/profile', credentials);
+            login.success(cacheSession);
+            return login;
+        },
+        logout: function(){
+            var logout = $http.get('partials/logout', credentials);
+            logout.success(uncacheSession);
+            return logout;
+        },
+        loggedIn: function(){
+            return sessionFactory.get('authenticated');
+        }
+    };
+});
